@@ -1,0 +1,58 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Recommended for You</ion-card-title>
+    <ion-card-subtitle>Personalized content based on your interests</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading recommendations...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{ error }}</p>
+      <ion-button fill="clear" (click)="loadRecommendations()">
+        Try Again
+      </ion-button>
+    </div>
+
+    <!-- Recommendations List -->
+    <ion-list *ngIf="!loading && !error">
+      <ion-item *ngFor="let recommendation of recommendations" 
+                class="recommendation-item"
+                (click)="openRecommendation(recommendation)">
+        <ion-icon [name]="getRecommendationIcon(recommendation.type)"
+                 [color]="getRecommendationColor(recommendation.type)"
+                 slot="start">
+        </ion-icon>
+        
+        <ion-label>
+          <h2>{{ recommendation.title }}</h2>
+          <p>{{ recommendation.description }}</p>
+          <div class="recommendation-meta">
+            <ion-badge [color]="getRecommendationColor(recommendation.type)">
+              {{ recommendation.type | titlecase }}
+            </ion-badge>
+            <ion-badge color="medium">
+              {{ formatRelevance(recommendation.relevance) }} match
+            </ion-badge>
+          </div>
+        </ion-label>
+
+        <ion-button fill="clear" slot="end">
+          <ion-icon name="chevron-forward-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-list>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && recommendations.length === 0" class="empty-state">
+      <ion-icon name="information-circle-outline"></ion-icon>
+      <p>No recommendations available yet. Start exploring content to get personalized recommendations!</p>
+    </div>
+  </ion-card-content>
+</ion-card> 

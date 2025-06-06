@@ -1,0 +1,102 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>News</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="refresh()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="news-container">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading news...</p>
+    </div>
+
+    <!-- Error State -->
+    <ion-card *ngIf="error" color="danger">
+      <ion-card-content>
+        <p>Failed to load news. Please try again later.</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- News Filter -->
+    <ion-segment [(ngModel)]="selectedSource" (ionChange)="filterBySource($event)">
+      <ion-segment-button value="all">
+        <ion-label>All</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="market">
+        <ion-label>Market</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="economic">
+        <ion-label>Economic</ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="sector">
+        <ion-label>Sector</ion-label>
+      </ion-segment-button>
+    </ion-segment>
+
+    <!-- News List -->
+    <ion-list>
+      <ion-item *ngFor="let item of filteredNews" class="news-item">
+        <ion-card class="news-card">
+          <ion-card-header>
+            <ion-card-subtitle>
+              <ion-badge color="primary">{{ item.source }}</ion-badge>
+              <span class="news-date">{{ item.publishedAt | date:'medium' }}</span>
+            </ion-card-subtitle>
+            <ion-card-title>
+              <a [href]="item.url" target="_blank" rel="noopener noreferrer">
+                {{ item.title }}
+              </a>
+            </ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <p>{{ item.content }}</p>
+            <div class="related-stocks" *ngIf="item.relatedStocks.length > 0">
+              <ion-chip *ngFor="let stock of item.relatedStocks" color="secondary">
+                {{ stock }}
+              </ion-chip>
+            </div>
+            <div class="news-meta">
+              <ion-badge [color]="getSentimentColor(item.sentiment)">
+                {{ item.sentiment | titlecase }}
+              </ion-badge>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </ion-item>
+    </ion-list>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && filteredNews.length === 0" class="empty-container">
+      <ion-icon name="newspaper-outline"></ion-icon>
+      <p>No news available at the moment.</p>
+    </div>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-tabs>
+      <ion-tab-bar slot="bottom">
+        <ion-tab-button tab="dashboard">
+          <ion-icon name="home-outline"></ion-icon>
+          <ion-label>Dashboard</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="news">
+          <ion-icon name="newspaper-outline"></ion-icon>
+          <ion-label>News</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="analysis">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <ion-label>Analysis</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+    </ion-tabs>
+  </ion-toolbar>
+</ion-footer> 

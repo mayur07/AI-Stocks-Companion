@@ -1,0 +1,80 @@
+/* Core CSS required for Ionic components to work properly */
+@import "@ionic/angular/css/core.css";
+
+/* Basic CSS for apps built with Ionic */
+@import "@ionic/angular/css/normalize.css";
+@import "@ionic/angular/css/structure.css";
+@import "@ionic/angular/css/typography.css";
+@import '@ionic/angular/css/display.css';
+
+/* Optional CSS utils that can be commented out */
+@import "@ionic/angular/css/padding.css";
+@import "@ionic/angular/css/float-elements.css";
+@import "@ionic/angular/css/text-alignment.css";
+@import "@ionic/angular/css/text-transformation.css";
+@import "@ionic/angular/css/flex-utils.css";
+
+/* Custom styles */
+:root {
+  --ion-color-primary: #3880ff;
+  --ion-color-secondary: #3dc2ff;
+  --ion-color-tertiary: #5260ff;
+  --ion-color-success: #2dd36f;
+  --ion-color-warning: #ffc409;
+  --ion-color-danger: #eb445a;
+  --ion-color-medium: #92949c;
+  --ion-color-light: #f4f5f8;
+}
+
+/* Dashboard specific styles */
+.dashboard-container {
+  padding: 16px;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.summary-item {
+  text-align: center;
+  padding: 16px;
+  background: var(--ion-color-light);
+  border-radius: 8px;
+}
+
+.summary-item h3 {
+  margin: 0 0 8px 0;
+  font-size: 14px;
+  color: var(--ion-color-medium);
+}
+
+.summary-item p {
+  margin: 0;
+  font-size: 24px;
+  font-weight: bold;
+  color: var(--ion-color-dark);
+}
+
+.stock-details {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.positive {
+  color: var(--ion-color-success);
+}
+
+.negative {
+  color: var(--ion-color-danger);
+}
+
+.data-quality {
+  font-size: 12px;
+  color: var(--ion-color-medium);
+  margin: 4px 0 0 0;
+} 

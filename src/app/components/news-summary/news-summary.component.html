@@ -1,0 +1,50 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>News Summary</ion-card-title>
+    <ion-card-subtitle>Latest news and analysis</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <div class="news-list">
+      <div *ngFor="let summary of summaries.slice(0, maxItems); let i = index" class="news-item">
+        <div class="news-header">
+          <h3 class="news-title">{{ summary.title }}</h3>
+          <div class="news-meta">
+            <ion-badge [color]="getSentimentColor(summary.sentiment)" class="sentiment-badge">
+              <ion-icon [name]="getSentimentIcon(summary.sentiment)"></ion-icon>
+              {{ summary.sentiment | titlecase }}
+            </ion-badge>
+            <ion-badge [color]="getRelevanceColor(summary.relevance)" class="relevance-badge">
+              <ion-icon name="trending-up-outline"></ion-icon>
+              {{ (summary.relevance * 100).toFixed(0) }}% relevant
+            </ion-badge>
+            <span class="news-date">{{ formatDate(summary.publishedAt) }}</span>
+            <span class="news-source">{{ summary.source }}</span>
+          </div>
+        </div>
+
+        <div class="news-summary">
+          <p>{{ summary.summary }}</p>
+        </div>
+
+        <div class="key-points" *ngIf="summary.keyPoints.length > 0">
+          <h4>Key Points:</h4>
+          <ul>
+            <li *ngFor="let point of summary.keyPoints">{{ point }}</li>
+          </ul>
+        </div>
+
+        <div class="news-actions">
+          <ion-button fill="clear" (click)="toggleExpand(i)">
+            <ion-icon [name]="isExpanded(i) ? 'chevron-up-outline' : 'chevron-down-outline'" slot="start"></ion-icon>
+            {{ isExpanded(i) ? 'Show Less' : 'Read More' }}
+          </ion-button>
+          <ion-button fill="clear" (click)="openArticle(summary.url)">
+            <ion-icon name="open-outline" slot="start"></ion-icon>
+            Open Article
+          </ion-button>
+        </div>
+      </div>
+    </div>
+  </ion-card-content>
+</ion-card> 

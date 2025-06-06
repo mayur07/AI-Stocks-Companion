@@ -1,0 +1,291 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="/dashboard"></ion-back-button>
+    </ion-buttons>
+    <ion-title>Stock Analysis: {{ symbol }}</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="refreshAnalysis()" [disabled]="loading">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="analysis-container">
+    <!-- Search Section -->
+    <div class="search-section">
+      <ion-card class="search-card">
+        <ion-card-content>
+          <div class="search-container">
+            <ion-searchbar
+              [(ngModel)]="symbol"
+              placeholder="Enter stock symbol (e.g., AAPL)"
+              (ionInput)="analyzeStock()"
+              [debounce]="500"
+              class="custom-searchbar"
+              animated
+              clear-on-edit="false"
+            ></ion-searchbar>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading analysis...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container">
+      <ion-icon name="alert-circle-outline"></ion-icon>
+      <p>{{ error }}</p>
+    </div>
+
+    <!-- Analysis Content -->
+    <div *ngIf="analysisData && !loading && !error" class="analysis-content">
+      <!-- Analysis Summary Card -->
+      <ion-card class="analysis-card">
+        <ion-card-header>
+          <ion-card-title>{{ analysisData.symbol }}</ion-card-title>
+          <ion-card-subtitle>Last Updated: {{ analysisData.lastUpdated | date:'medium' }}</ion-card-subtitle>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="analysis-grid">
+            <!-- Current Price -->
+            <div class="analysis-item">
+              <h3>Current Price</h3>
+              <div class="price-container">
+                <span class="price">${{ analysisData.price | number:'1.2-2' }}</span>
+                <span class="change" [ngClass]="getChangeClass()">
+                  {{ getChangePrefix() }}{{ analysisData.changePercent | number:'1.2-2' }}%
+                </span>
+              </div>
+            </div>
+
+            <!-- Market Sentiment -->
+            <div class="analysis-item">
+              <h3>Market Sentiment</h3>
+              <div class="sentiment-container" [ngClass]="getSentimentClass(analysisData.sentiment.overallSentiment)">
+                <ion-icon [name]="getSentimentIcon(analysisData.sentiment.overallSentiment)"></ion-icon>
+                <span>{{ analysisData.sentiment.overallSentiment | titlecase }}</span>
+              </div>
+            </div>
+
+            <!-- Price Prediction -->
+            <div class="analysis-item">
+              <h3>Price Prediction</h3>
+              <div class="prediction-container" [ngClass]="getPredictionClass()">
+                <ion-icon [name]="getPredictionIcon()"></ion-icon>
+                <span>{{ getPricePrediction() }}</span>
+              </div>
+            </div>
+
+            <!-- Analysis Quality -->
+            <div class="analysis-item">
+              <h3>Analysis Quality</h3>
+              <div class="quality-meter">
+                <div class="quality-bar" [style.width.%]="analysisData.dataQuality"></div>
+                <span class="quality-label">{{ getDataQualityText() }}</span>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- Technical Analysis Card -->
+      <ion-card class="analysis-card">
+        <ion-card-header>
+          <ion-card-title>Technical Analysis</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="technical-grid">
+            <!-- RSI -->
+            <div class="technical-item">
+              <h4>RSI (14)</h4>
+              <div class="indicator-value" [ngClass]="getRSIClass(analysisData.technicalIndicators.rsi)">
+                {{ analysisData.technicalIndicators.rsi | number:'1.0-1' }}
+              </div>
+              <div class="indicator-label">{{ getRSILabel(analysisData.technicalIndicators.rsi) }}</div>
+            </div>
+
+            <!-- MACD -->
+            <div class="technical-item">
+              <h4>MACD</h4>
+              <div class="indicator-value" [ngClass]="getMACDClass(analysisData.technicalIndicators.macd)">
+                {{ analysisData.technicalIndicators.macd.histogram | number:'1.2-2' }}
+              </div>
+              <div class="indicator-label">{{ getMACDLabel(analysisData.technicalIndicators.macd) }}</div>
+            </div>
+
+            <!-- Moving Averages -->
+            <div class="technical-item">
+              <h4>Moving Averages</h4>
+              <div class="ma-values">
+                <div class="ma-item">
+                  <span class="ma-label">SMA (20):</span>
+                  <span class="ma-value">{{ analysisData.technicalIndicators.sma20 | number:'1.2-2' }}</span>
+                </div>
+                <div class="ma-item">
+                  <span class="ma-label">EMA (20):</span>
+                  <span class="ma-value">{{ analysisData.technicalIndicators.ema20 | number:'1.2-2' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+
+      <!-- News Analysis Card -->
+      <ion-card class="analysis-card" *ngIf="hasNewsSummaries()">
+        <ion-card-header>
+          <ion-card-title>Market News</ion-card-title>
+        </ion-card-header>
+        <ion-card-content>
+          <div class="news-list">
+            <div *ngFor="let news of newsSummaries" class="news-item">
+              <div class="news-header">
+                <h4>{{ news.title }}</h4>
+                <span class="news-date">{{ news.publishedAt | date:'medium' }}</span>
+              </div>
+              <p class="news-summary">{{ news.summary }}</p>
+              <div class="news-footer">
+                <span class="news-source">{{ news.source }}</span>
+                <a [href]="news.url" target="_blank" class="news-link">Read More</a>
+              </div>
+            </div>
+          </div>
+        </ion-card-content>
+      </ion-card>
+    </div>
+
+    <!-- AI Analysis Section -->
+    <ion-card *ngIf="showAIAnalysis && aiAnalysis" class="ai-analysis-card">
+      <ion-card-header>
+        <ion-card-title>AI Analysis</ion-card-title>
+        <ion-card-subtitle>Powered by Advanced Analytics</ion-card-subtitle>
+      </ion-card-header>
+
+      <ion-card-content>
+        <!-- Price Prediction -->
+        <div class="ai-section">
+          <h3>Price Prediction</h3>
+          <div class="prediction-details">
+            <div class="prediction-value">
+              <span class="label">Predicted Price:</span>
+              <span class="value">${{aiAnalysis.pricePrediction.predictedPrice | number:'1.2-2'}}</span>
+            </div>
+            <div class="prediction-confidence">
+              <span class="label">Confidence:</span>
+              <span class="value">{{aiAnalysis.pricePrediction.confidence | number:'1.0-0'}}%</span>
+            </div>
+            <div class="prediction-timeframe">
+              <span class="label">Timeframe:</span>
+              <span class="value">{{aiAnalysis.pricePrediction.timeframe}}</span>
+            </div>
+          </div>
+          <div class="prediction-factors">
+            <h4>Key Factors:</h4>
+            <ul>
+              <li *ngFor="let factor of aiAnalysis.pricePrediction.factors">{{factor}}</li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Technical Insights -->
+        <div class="ai-section">
+          <h3>Technical Insights</h3>
+          <div class="insights-content">
+            <div class="trend-analysis">
+              <h4>Trend Analysis</h4>
+              <p>{{aiAnalysis.technicalInsights.trendAnalysis}}</p>
+            </div>
+            <div class="support-resistance">
+              <h4>Support & Resistance</h4>
+              <div class="levels">
+                <div class="resistance">
+                  <span class="label">Resistance:</span>
+                  <span class="value" *ngFor="let level of aiAnalysis.technicalInsights.supportResistance.resistance">
+                    ${{level | number:'1.2-2'}}
+                  </span>
+                </div>
+                <div class="support">
+                  <span class="label">Support:</span>
+                  <span class="value" *ngFor="let level of aiAnalysis.technicalInsights.supportResistance.support">
+                    ${{level | number:'1.2-2'}}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="patterns">
+              <h4>Pattern Recognition</h4>
+              <ul>
+                <li *ngFor="let pattern of aiAnalysis.technicalInsights.patternRecognition">{{pattern}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Risk Assessment -->
+        <div class="ai-section">
+          <h3>Risk Assessment</h3>
+          <div class="risk-content">
+            <div class="risk-level" [ngClass]="aiAnalysis.riskAssessment.riskLevel">
+              <span class="label">Risk Level:</span>
+              <span class="value">{{aiAnalysis.riskAssessment.riskLevel | titlecase}}</span>
+            </div>
+            <div class="volatility">
+              <span class="label">Volatility:</span>
+              <span class="value">{{aiAnalysis.riskAssessment.volatility | number:'1.0-2'}}</span>
+            </div>
+            <div class="risk-factors">
+              <h4>Risk Factors:</h4>
+              <ul>
+                <li *ngFor="let factor of aiAnalysis.riskAssessment.riskFactors">{{factor}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Investment Recommendation -->
+        <div class="ai-section">
+          <h3>Investment Recommendation</h3>
+          <div class="recommendation-content">
+            <div class="action" [ngClass]="aiAnalysis.investmentRecommendation.action">
+              <span class="label">Action:</span>
+              <span class="value">{{aiAnalysis.investmentRecommendation.action | titlecase}}</span>
+            </div>
+            <div class="confidence">
+              <span class="label">Confidence:</span>
+              <span class="value">{{aiAnalysis.investmentRecommendation.confidence | number:'1.0-0'}}%</span>
+            </div>
+            <div class="targets">
+              <div class="target-price">
+                <span class="label">Target Price:</span>
+                <span class="value">${{aiAnalysis.investmentRecommendation.targetPrice | number:'1.2-2'}}</span>
+              </div>
+              <div class="stop-loss">
+                <span class="label">Stop Loss:</span>
+                <span class="value">${{aiAnalysis.investmentRecommendation.stopLoss | number:'1.2-2'}}</span>
+              </div>
+            </div>
+            <div class="reasoning">
+              <h4>Reasoning:</h4>
+              <ul>
+                <li *ngFor="let reason of aiAnalysis.investmentRecommendation.reasoning">{{reason}}</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Toggle AI Analysis Button -->
+    <ion-button expand="block" (click)="toggleAIAnalysis()" class="ai-toggle-button">
+      {{showAIAnalysis ? 'Hide AI Analysis' : 'Show AI Analysis'}}
+    </ion-button>
+  </div>
+</ion-content> 

@@ -1,0 +1,160 @@
+.stock-details-container {
+  padding: 16px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.stock-content {
+  animation: fadeIn 0.3s ease-in-out;
+  ion-card {
+    margin-bottom: 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  ion-card-header {
+    background-color: var(--ion-color-light);
+    border-bottom: 1px solid var(--ion-color-light-shade);
+  }
+
+  ion-card-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+}
+
+.price-info {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  .current-price {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
+
+    h2 {
+      font-size: 2rem;
+      margin: 0;
+    }
+  }
+
+  .price-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+  }
+}
+
+.company-info {
+  .description {
+    margin-bottom: 24px;
+    line-height: 1.6;
+    color: var(--ion-color-medium);
+  }
+
+  .info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 24px;
+  }
+
+  .info-item {
+    h3 {
+      font-size: 0.9rem;
+      color: var(--ion-color-medium);
+      margin-bottom: 4px;
+    }
+
+    p {
+      font-size: 1.1rem;
+      font-weight: 500;
+      margin: 0;
+    }
+  }
+}
+
+ion-list {
+  background: transparent;
+  padding: 0;
+}
+
+ion-item {
+  --background: transparent;
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 16px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  ion-label {
+    h2 {
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    p {
+      color: var(--ion-color-medium);
+      margin-bottom: 8px;
+    }
+  }
+}
+
+ion-badge {
+  padding: 4px 8px;
+  font-weight: 500;
+}
+
+.news-item {
+  .news-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: var(--ion-color-medium);
+
+    .source {
+      font-weight: 500;
+    }
+  }
+
+  .news-content {
+    font-size: 1rem;
+    line-height: 1.5;
+    color: var(--ion-color-dark);
+    margin-bottom: 12px;
+  }
+
+  .sentiment-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+  
+  ion-spinner {
+    margin-bottom: 16px;
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+} 

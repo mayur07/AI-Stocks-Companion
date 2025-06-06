@@ -1,0 +1,119 @@
+<ion-card>
+  <ion-card-header>
+    <ion-card-title>Sentiment Analysis</ion-card-title>
+    <ion-card-subtitle>{{ getSentimentLabel() }} ({{ getConfidenceLabel() }})</ion-card-subtitle>
+  </ion-card-header>
+
+  <ion-card-content>
+    <div class="sentiment-container">
+      <!-- Sentiment Gauge -->
+      <div class="gauge-container">
+        <div class="gauge">
+          <div class="gauge-body">
+            <div class="gauge-fill" [style.transform]="'rotate(' + (gaugeValue * 1.8) + 'deg)'"
+                 [style.background-color]="gaugeColor"></div>
+            <div class="gauge-cover">{{ gaugeValue.toFixed(1) }}%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sentiment Components -->
+      <div class="sentiment-components">
+        <div class="component">
+          <span class="label">Positive</span>
+          <ion-progress-bar [value]="sentimentAnalysis.sentimentScore.components.positive"
+                          color="success"></ion-progress-bar>
+          <span class="value">{{ (sentimentAnalysis.sentimentScore.components.positive * 100).toFixed(1) }}%</span>
+        </div>
+        <div class="component">
+          <span class="label">Neutral</span>
+          <ion-progress-bar [value]="sentimentAnalysis.sentimentScore.components.neutral"
+                          color="warning"></ion-progress-bar>
+          <span class="value">{{ (sentimentAnalysis.sentimentScore.components.neutral * 100).toFixed(1) }}%</span>
+        </div>
+        <div class="component">
+          <span class="label">Negative</span>
+          <ion-progress-bar [value]="sentimentAnalysis.sentimentScore.components.negative"
+                          color="danger"></ion-progress-bar>
+          <span class="value">{{ (sentimentAnalysis.sentimentScore.components.negative * 100).toFixed(1) }}%</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Topic Distribution -->
+    <div class="topics-container">
+      <h3>Topic Distribution</h3>
+      <div class="topics-grid">
+        <ion-card *ngFor="let topic of sentimentAnalysis.sentimentScore.topics" class="topic-card">
+          <ion-card-header>
+            <ion-card-title>{{ topic | titlecase }}</ion-card-title>
+          </ion-card-header>
+          <ion-card-content>
+            <div class="topic-keywords">
+              <ion-chip *ngFor="let keyword of getTopicKeywords(topic)"
+                       [color]="getKeywordColor(keyword)">
+                {{ keyword.word }}
+              </ion-chip>
+            </div>
+          </ion-card-content>
+        </ion-card>
+      </div>
+    </div>
+
+    <!-- Sentiment Trend Chart -->
+    <div class="trend-chart">
+      <canvas id="sentimentTrendChart"></canvas>
+    </div>
+
+    <!-- Entity Recognition -->
+    <div class="entities-container">
+      <h3>Key Entities</h3>
+      <div class="entities-grid">
+        <div class="entity-category" *ngFor="let category of getEntityCategories()">
+          <h4>{{ category | titlecase }}</h4>
+          <div class="entity-list">
+            <ion-chip *ngFor="let entity of getEntitiesByCategory(category)"
+                     [color]="getEntityColor(entity)">
+              {{ entity.word }}
+            </ion-chip>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Top Keywords -->
+    <div class="keywords-container">
+      <h3>Key Sentiment Indicators</h3>
+      <div class="keywords-list">
+        <ion-chip *ngFor="let keyword of getTopKeywords()"
+                 [color]="keyword.score > 0 ? 'success' : keyword.score < 0 ? 'danger' : 'warning'">
+          {{ keyword.word }}
+          <ion-label>{{ (keyword.score * 100).toFixed(0) }}%</ion-label>
+        </ion-chip>
+      </div>
+    </div>
+
+    <!-- Recent News Sentiment -->
+    <div class="news-sentiment">
+      <h3>Recent News Sentiment</h3>
+      <ion-list>
+        <ion-item *ngFor="let news of sentimentAnalysis.newsSentiment.slice(0, 3)">
+          <ion-label>
+            <h2>{{ news.title }}</h2>
+            <p>{{ news.publishedAt | date:'medium' }}</p>
+            <div class="news-topics">
+              <ion-badge *ngFor="let topic of news.score.topics"
+                        [color]="getTopicColor(topic)">
+                {{ topic }}
+              </ion-badge>
+            </div>
+          </ion-label>
+          <ion-badge slot="end" [color]="news.sentiment === 'positive' ? 'success' : 
+                                        news.sentiment === 'negative' ? 'danger' : 'warning'">
+            {{ news.sentiment }}
+          </ion-badge>
+        </ion-item>
+      </ion-list>
+    </div>
+  </ion-card-content>
+</ion-card> 

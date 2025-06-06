@@ -1,0 +1,188 @@
+.news-container {
+  padding: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.loading-container,
+.error-container,
+.empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  text-align: center;
+  color: var(--ion-color-medium);
+
+  ion-icon {
+    font-size: 48px;
+    margin-bottom: 16px;
+  }
+
+  p {
+    margin: 8px 0;
+  }
+}
+
+.news-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  margin-bottom: 16px;
+}
+
+.news-card {
+  width: 100%;
+  margin: 0;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  ion-card-header {
+    padding: 16px;
+  }
+
+  ion-card-subtitle {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 8px;
+
+    .news-date {
+      color: var(--ion-color-medium);
+      font-size: 0.9em;
+    }
+  }
+
+  ion-card-title {
+    font-size: 1.2em;
+    font-weight: 600;
+    margin: 8px 0;
+
+    a {
+      color: var(--ion-color-dark);
+      text-decoration: none;
+
+      &:hover {
+        color: var(--ion-color-primary);
+      }
+    }
+  }
+
+  ion-card-content {
+    padding: 0 16px 16px;
+
+    p {
+      color: var(--ion-color-medium);
+      margin: 8px 0;
+      line-height: 1.5;
+    }
+
+    .related-stocks {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+  }
+}
+
+.news-item h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: var(--ion-color-dark);
+}
+
+.news-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: var(--ion-color-medium);
+
+  .source {
+    font-weight: 500;
+  }
+
+  .time {
+    color: var(--ion-color-medium);
+  }
+}
+
+.news-content {
+  font-size: 1rem;
+  line-height: 1.5;
+  color: var(--ion-color-dark);
+  margin-bottom: 12px;
+}
+
+.news-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+
+  .sentiment-badge {
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+  }
+
+  ion-chip {
+    --background: var(--ion-color-light-shade);
+    --color: var(--ion-color-dark);
+  }
+}
+
+ion-segment {
+  --background: var(--ion-color-light);
+  padding: 8px;
+  border-radius: 8px;
+  margin: 8px 16px;
+}
+
+ion-segment-button {
+  --color: var(--ion-color-medium);
+  --color-checked: var(--ion-color-primary);
+  --indicator-color: var(--ion-color-primary);
+  font-weight: 500;
+}
+
+.iframe-container {
+  position: relative;
+  width: 100%;
+  height: 500px;
+  overflow: hidden;
+  border-radius: 8px;
+  background: var(--ion-color-light);
+
+  iframe {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+  }
+}
+
+ion-card {
+  margin-bottom: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+ion-card-header {
+  background: var(--ion-color-light);
+  border-bottom: 1px solid var(--ion-color-light-shade);
+}
+
+ion-card-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: var(--ion-color-dark);
+}
+
+ion-card-content {
+  padding: 16px;
+} 

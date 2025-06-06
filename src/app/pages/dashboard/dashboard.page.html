@@ -1,0 +1,170 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Dashboard</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="loadNews()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <div class="dashboard-container">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading market data...</p>
+    </div>
+
+    <!-- Error State -->
+    <ion-card *ngIf="error" color="danger">
+      <ion-card-content>
+        <p>{{ error }}</p>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Market Overview Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Market Overview</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="market-status">
+          <ion-badge [color]="marketStatus === 'open' ? 'success' : 'danger'">
+            Market {{ marketStatus === 'open' ? 'Open' : 'Closed' }}
+          </ion-badge>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Top Stocks Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Top Stocks to Watch</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item *ngFor="let stock of topStocks">
+            <ion-label>
+              <h2>{{ stock.symbol }}</h2>
+              <p>Price: ${{ stock.averagePrice | number:'1.2-2' }}</p>
+              <p>Change: {{ stock.averageChange | number:'1.2-2' }}%</p>
+            </ion-label>
+            <div slot="end">
+              <ion-badge [color]="getSentimentColor(stock.consensus)">
+                {{ stock.consensus | titlecase }}
+              </ion-badge>
+              <p class="impact-text">{{ getStockImpact(stock) }}</p>
+            </div>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Market News Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Latest Market News</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <ion-list>
+          <ion-item class="news-item" *ngFor="let item of marketNews">
+            <ion-card class="news-card">
+              <ion-card-header>
+                <ion-card-subtitle>
+                  <ion-badge color="primary">{{ item.source }}</ion-badge>
+                  <span class="news-date">{{ item.publishedAt | date:'short' }}</span>
+                </ion-card-subtitle>
+                <ion-card-title>
+                  <a [href]="item.url" target="_blank" rel="noopener noreferrer">
+                    {{ item.title }}
+                  </a>
+                </ion-card-title>
+              </ion-card-header>
+              <ion-card-content>
+                <p>{{ item.content }}</p>
+                <div class="related-stocks" *ngIf="item.relatedStocks.length > 0">
+                  <ion-chip *ngFor="let stock of item.relatedStocks" color="secondary">
+                    {{ stock }}
+                  </ion-chip>
+                </div>
+                <div class="news-meta">
+                  <ion-badge [color]="getSentimentColor(item.sentiment)">
+                    {{ item.sentiment | titlecase }}
+                  </ion-badge>
+                </div>
+              </ion-card-content>
+            </ion-card>
+          </ion-item>
+        </ion-list>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Economic News Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Economic News</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="news-list">
+          <ion-item *ngFor="let item of economicNews">
+            <ion-label>
+              <h2>{{ item.title }}</h2>
+              <p>{{ item.source }} • {{ item.publishedAt | date:'short' }}</p>
+            </ion-label>
+            <ion-badge slot="end" [color]="getSentimentColor(item.sentiment)">
+              {{ item.sentiment | titlecase }}
+            </ion-badge>
+          </ion-item>
+        </div>
+      </ion-card-content>
+    </ion-card>
+
+    <!-- Sector News Section -->
+    <ion-card>
+      <ion-card-header>
+        <ion-card-title>Sector News</ion-card-title>
+      </ion-card-header>
+      <ion-card-content>
+        <div class="news-list">
+          <ion-item *ngFor="let item of sectorNews">
+            <ion-label>
+              <h2>{{ item.title }}</h2>
+              <p>{{ item.source }} • {{ item.publishedAt | date:'short' }}</p>
+              <div class="related-stocks" *ngIf="item.relatedStocks.length > 0">
+                <ion-chip *ngFor="let stock of item.relatedStocks" color="secondary" size="small">
+                  {{ stock }}
+                </ion-chip>
+              </div>
+            </ion-label>
+            <ion-badge slot="end" [color]="getSentimentColor(item.sentiment)">
+              {{ item.sentiment | titlecase }}
+            </ion-badge>
+          </ion-item>
+        </div>
+      </ion-card-content>
+    </ion-card>
+  </div>
+</ion-content>
+
+<ion-footer>
+  <ion-toolbar>
+    <ion-tabs>
+      <ion-tab-bar slot="bottom">
+        <ion-tab-button tab="dashboard">
+          <ion-icon name="home-outline"></ion-icon>
+          <ion-label>Dashboard</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="news">
+          <ion-icon name="newspaper-outline"></ion-icon>
+          <ion-label>News</ion-label>
+        </ion-tab-button>
+        <ion-tab-button tab="analysis">
+          <ion-icon name="analytics-outline"></ion-icon>
+          <ion-label>Analysis</ion-label>
+        </ion-tab-button>
+      </ion-tab-bar>
+    </ion-tabs>
+  </ion-toolbar>
+</ion-footer> 

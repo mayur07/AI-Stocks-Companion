@@ -1,0 +1,7 @@
+{
+  "name": "intelligent-stock-market-companion",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular-standalone"
+}

@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "truncation": {
+    "max_length": 1024,
+    "stride": 0,
+    "strategy": "longest_first"
+  },
+  "padding": {
+    "max_length": 1024,
+    "padding_side": "right",
+    "pad_to_multiple_of": 0
+  },
+  "model_max_length": 1024,
+  "special_tokens_map": {
+    "bos_token": "<s>",
+    "eos_token": "</s>",
+    "unk_token": "<unk>",
+    "sep_token": "</s>",
+    "pad_token": "<pad>",
+    "cls_token": "<s>",
+    "mask_token": "<mask>"
+  },
+  "clean_up_tokenization_spaces": true,
+  "tokenizer_class": "BartTokenizer",
+  "model_type": "bart",
+  "vocab_size": 50265,
+  "merges": [],
+  "vocab": {
+    "<s>": 0,
+    "<pad>": 1,
+    "</s>": 2,
+    "<unk>": 3,
+    "<mask>": 4
+  }
+} 

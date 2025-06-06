@@ -1,0 +1,45 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Watchlist</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="refreshWatchlist()">
+        <ion-icon name="refresh-outline"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refreshWatchlist()">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="watchlist-container">
+    <ion-list *ngIf="!isLoading">
+      <ion-item *ngFor="let stock of watchlist">
+        <ion-label>
+          <h2>{{ stock.name }} ({{ stock.symbol }})</h2>
+          <p>Price: ${{ stock.price | number:'1.2-2' }}</p>
+          <p>Volume: {{ stock.volume | number }}</p>
+        </ion-label>
+        <ion-note slot="end" [color]="stock.change >= 0 ? 'success' : 'danger'">
+          {{ stock.changePercent | number:'1.2-2' }}%
+        </ion-note>
+        <ion-button slot="end" fill="clear" (click)="removeFromWatchlist(stock.symbol)">
+          <ion-icon name="close-outline"></ion-icon>
+        </ion-button>
+      </ion-item>
+    </ion-list>
+
+    <div *ngIf="isLoading" class="loading-container">
+      <ion-spinner name="crescent"></ion-spinner>
+      <p>Loading watchlist...</p>
+    </div>
+
+    <div *ngIf="!isLoading && watchlist.length === 0" class="empty-state">
+      <ion-icon name="list-outline"></ion-icon>
+      <h3>Your watchlist is empty</h3>
+      <p>Add stocks to your watchlist to track their performance</p>
+    </div>
+  </div>
+</ion-content> 

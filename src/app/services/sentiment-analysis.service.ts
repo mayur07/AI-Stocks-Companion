@@ -5,38 +5,7 @@ import { map, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import * as tf from '@tensorflow/tfjs';
 import { pipeline } from '@xenova/transformers';
-
-export interface SentimentScore {
-  score: number;  // -1 to 1 scale
-  confidence: number;  // 0 to 1 scale
-  components: {
-    positive: number;
-    negative: number;
-    neutral: number;
-  };
-  keywords: Array<{
-    word: string;
-    score: number;
-    category: string;
-  }>;
-  topics: string[];
-}
-
-export interface SentimentAnalysis {
-  overallSentiment: 'positive' | 'negative' | 'neutral';
-  sentimentScore: SentimentScore;
-  newsSentiment: Array<{
-    title: string;
-    content: string;
-    sentiment: 'positive' | 'negative' | 'neutral';
-    score: SentimentScore;
-    publishedAt: Date;
-  }>;
-  trend: Array<{
-    date: Date;
-    score: number;
-  }>;
-}
+import { SentimentAnalysis, SentimentScore, Keyword, Entity, TrendPoint, NewsSentiment } from '../models/sentiment.model';
 
 @Injectable({
   providedIn: 'root'
@@ -72,24 +41,31 @@ export class SentimentAnalysisService {
       // Convert the model output to our SentimentScore format
       const score = this.normalizeScore(result[0].score);
       const components = this.calculateComponents(result);
-      const keywords = this.extractKeywords(text);
+      const keywords = this.extractKeywords(text).map(k => ({
+        ...k,
+        topic: k.category // Use category as topic for now
+      }));
       const topics = this.extractTopics(text);
       
       return {
-        score,
+        overall: score,
         confidence: result[0].score,
         components,
         keywords,
-        topics
+        topics,
+        entities: [],
+        trend: []
       };
     } catch (error) {
       console.error('Error analyzing text:', error);
       return {
-        score: 0,
+        overall: 0,
         confidence: 0,
         components: { positive: 0, negative: 0, neutral: 0 },
         keywords: [],
-        topics: []
+        topics: [],
+        entities: [],
+        trend: []
       };
     }
   }
@@ -276,7 +252,7 @@ export class SentimentAnalysisService {
             return {
               title: item.title,
               content: item.content,
-              sentiment: this.getSentimentLabel(score.score),
+              sentiment: this.getSentimentLabel(score.overall),
               score,
               publishedAt: new Date(item.publishedAt)
             };
@@ -290,16 +266,16 @@ export class SentimentAnalysisService {
         const trend = this.generateSentimentTrend(newsSentiment);
 
         const analysis: SentimentAnalysis = {
-          overallSentiment: this.getSentimentLabel(overallScore),
           sentimentScore: {
-            score: overallScore,
+            overall: overallScore,
             confidence: this.calculateConfidence(newsSentiment),
             components: this.calculateOverallComponents(newsSentiment),
             keywords: this.aggregateKeywords(newsSentiment),
-            topics: this.extractTopics(newsSentiment.map(item => item.content).join(' '))
+            topics: this.extractTopics(newsSentiment.map(item => item.content).join(' ')),
+            entities: [],
+            trend: []
           },
-          newsSentiment,
-          trend
+          newsSentiment
         };
 
         // Cache the results
@@ -310,16 +286,16 @@ export class SentimentAnalysisService {
       catchError(error => {
         console.error('Error in sentiment analysis:', error);
         return of({
-          overallSentiment: 'neutral',
           sentimentScore: {
-            score: 0,
+            overall: 0,
             confidence: 0,
             components: { positive: 0, negative: 0, neutral: 0 },
             keywords: [],
-            topics: []
+            topics: [],
+            entities: [],
+            trend: []
           },
-          newsSentiment: [],
-          trend: []
+          newsSentiment: []
         });
       })
     );
@@ -334,7 +310,7 @@ export class SentimentAnalysisService {
   private calculateOverallSentiment(newsSentiment: any[]): number {
     if (newsSentiment.length === 0) return 0;
     
-    const totalScore = newsSentiment.reduce((sum, item) => sum + item.score.score, 0);
+    const totalScore = newsSentiment.reduce((sum, item) => sum + item.score.overall, 0);
     return totalScore / newsSentiment.length;
   }
 
@@ -353,20 +329,30 @@ export class SentimentAnalysisService {
     }), { positive: 0, negative: 0, neutral: 0 });
   }
 
-  private aggregateKeywords(newsSentiment: any[]) {
-    const keywordMap = new Map<string, number>();
+  private aggregateKeywords(newsSentiment: NewsSentiment[]): Keyword[] {
+    const keywordMap = new Map<string, { score: number; topic: string; category: string }>();
     
     newsSentiment.forEach(item => {
-      item.score.keywords.forEach((keyword: any) => {
-        const currentScore = keywordMap.get(keyword.word) || 0;
-        keywordMap.set(keyword.word, currentScore + keyword.score);
+      item.score.keywords.forEach(keyword => {
+        if (keywordMap.has(keyword.word)) {
+          const existing = keywordMap.get(keyword.word)!;
+          existing.score = (existing.score + keyword.score) / 2;
+        } else {
+          keywordMap.set(keyword.word, {
+            score: keyword.score,
+            topic: keyword.topic,
+            category: keyword.category
+          });
+        }
       });
     });
 
-    return Array.from(keywordMap.entries())
-      .map(([word, score]) => ({ word, score: score / newsSentiment.length }))
-      .sort((a, b) => Math.abs(b.score) - Math.abs(a.score))
-      .slice(0, 10); // Return top 10 keywords
+    return Array.from(keywordMap.entries()).map(([word, data]) => ({
+      word,
+      score: data.score,
+      topic: data.topic,
+      category: data.category
+    }));
   }
 
   private generateSentimentTrend(newsSentiment: any[]) {
@@ -376,7 +362,7 @@ export class SentimentAnalysisService {
     newsSentiment.forEach(item => {
       const date = item.publishedAt.toISOString().split('T')[0];
       const scores = dailyScores.get(date) || [];
-      scores.push(item.score.score);
+      scores.push(item.score.overall);
       dailyScores.set(date, scores);
     });
 
@@ -386,5 +372,74 @@ export class SentimentAnalysisService {
         score: scores.reduce((sum, score) => sum + score, 0) / scores.length
       }))
       .sort((a, b) => a.date.getTime() - b.date.getTime());
+  }
+
+  getNewsSentiment(symbol: string): Observable<SentimentAnalysis> {
+    return this.http.get<any>(`${environment.apiUrl}/news/${symbol}`).pipe(
+      map(response => {
+        const sentiment = response.sentiment;
+        return {
+          sentimentScore: {
+            overall: sentiment.sentimentScore.overall,
+            confidence: sentiment.sentimentScore.confidence,
+            components: sentiment.sentimentScore.components,
+            keywords: (sentiment.sentimentScore.keywords || []).map((k: any) => ({
+              word: k.word,
+              score: k.score,
+              topic: k.topic || '',
+              category: k.category
+            })),
+            entities: (sentiment.sentimentScore.entities || []).map((e: any) => ({
+              word: e.word,
+              category: e.category,
+              relevance: e.relevance
+            })),
+            topics: sentiment.sentimentScore.topics || [],
+            trend: (sentiment.sentimentScore.trend || []).map((t: any) => ({
+              timestamp: t.timestamp,
+              score: t.score
+            }))
+          },
+          newsSentiment: (sentiment.newsSentiment || []).map((item: any) => ({
+            title: item.title,
+            publishedAt: item.publishedAt,
+            sentiment: this.normalizeSentiment(item.sentiment),
+            score: {
+              overall: item.score.overall,
+              topics: item.score.topics || [],
+              keywords: (item.score.keywords || []).map((k: any) => ({
+                word: k.word,
+                score: k.score,
+                topic: k.topic || '',
+                category: k.category
+              }))
+            }
+          }))
+        };
+      }),
+      catchError(error => {
+        console.error('Error fetching news sentiment:', error);
+        return of({
+          sentimentScore: {
+            overall: 0,
+            confidence: 0,
+            components: { positive: 0, neutral: 0, negative: 0 },
+            keywords: [],
+            entities: [],
+            topics: [],
+            trend: []
+          },
+          newsSentiment: []
+        });
+      })
+    );
+  }
+
+  private normalizeSentiment(sentiment: string): 'positive' | 'negative' | 'neutral' {
+    const normalized = sentiment.toLowerCase();
+    if (normalized === 'positive' || normalized === 'negative' || normalized === 'neutral') {
+      return normalized;
+    }
+    return 'neutral';
   }
 } 

@@ -4,6 +4,13 @@ import { Observable, of, throwError, forkJoin, BehaviorSubject, timer } from 'rx
 import { map, catchError, tap, switchMap, shareReplay, debounceTime, distinctUntilChanged } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 
+// Define the correct environment type
+interface StockMarketEnvironment {
+  polygonApiKey: string;
+  alphaVantageApiKey: string;
+  finnhubApiKey: string;
+}
+
 export interface StockData {
   symbol: string;
   name: string;
@@ -246,7 +253,9 @@ export class StockMarketService {
   private polygonBaseUrl = 'https://api.polygon.io/v2';
   private alphaVantageBaseUrl = 'https://www.alphavantage.co/query';
   private finnhubBaseUrl = 'https://finnhub.io/api/v1';
-  private apiKey = environment.polygonApiKey;
+  private apiKey = (environment as StockMarketEnvironment).polygonApiKey;
+  private alphaVantageApiKey = (environment as StockMarketEnvironment).alphaVantageApiKey;
+  private finnhubApiKey = (environment as StockMarketEnvironment).finnhubApiKey;
   private baseUrl = 'https://api.polygon.io';
 
   // Cache for market status
@@ -322,7 +331,7 @@ export class StockMarketService {
     // Make new request if cache is invalid
     return this.http.get(`${this.polygonBaseUrl}/aggs/ticker/${symbol}/prev`, {
       params: {
-        apiKey: environment.polygonApiKey
+        apiKey: this.apiKey
       }
     }).pipe(
       map(response => {
@@ -421,7 +430,7 @@ export class StockMarketService {
     return this.getAlphaVantageData('GLOBAL_QUOTE', {
       function: 'GLOBAL_QUOTE',
       symbol,
-      apikey: environment.alphaVantageApiKey
+      apikey: this.alphaVantageApiKey
     });
   }
 
@@ -429,7 +438,7 @@ export class StockMarketService {
     return this.http.get(`${this.finnhubBaseUrl}/quote`, {
       params: {
         symbol,
-        token: environment.finnhubApiKey
+        token: this.finnhubApiKey
       }
     }).pipe(
       catchError(error => {
@@ -454,12 +463,12 @@ export class StockMarketService {
       polygon: this.http.get<PolygonResponse>(`${this.polygonBaseUrl}/reference/news`, {
         params: {
           ticker: symbol,
-          apiKey: environment.polygonApiKey
+          apiKey: this.apiKey
         }
       }).pipe(
         catchError(() => of({ results: [] }))
       ),
-      alphaVantage: this.http.get<AlphaVantageResponse>(`${this.alphaVantageBaseUrl}?function=NEWS_SENTIMENT&tickers=${symbol}&apikey=${environment.alphaVantageApiKey}`).pipe(
+      alphaVantage: this.http.get<AlphaVantageResponse>(`${this.alphaVantageBaseUrl}?function=NEWS_SENTIMENT&tickers=${symbol}&apikey=${this.alphaVantageApiKey}`).pipe(
         catchError(() => of({ feed: [] }))
       )
     }).pipe(
@@ -573,7 +582,7 @@ export class StockMarketService {
     return this.http.get(`${this.polygonBaseUrl}/reference/news`, {
       params: {
         topic: 'economy',
-        apiKey: environment.polygonApiKey
+        apiKey: this.apiKey
       }
     }).pipe(
       map(response => this.transformNewsResponse(response)),
@@ -588,7 +597,7 @@ export class StockMarketService {
     return this.http.get(`${this.polygonBaseUrl}/reference/news`, {
       params: {
         topic: 'sectors',
-        apiKey: environment.polygonApiKey
+        apiKey: this.apiKey
       }
     }).pipe(
       map(response => this.transformNewsResponse(response)),
@@ -727,7 +736,7 @@ export class StockMarketService {
   getSentimentAnalysis(symbol: string): Observable<any> {
     return forkJoin({
       news: this.getStockNews(symbol),
-      alphaVantage: this.http.get<any>(`${this.alphaVantageBaseUrl}?function=NEWS_SENTIMENT&tickers=${symbol}&apikey=${environment.alphaVantageApiKey}`).pipe(
+      alphaVantage: this.http.get<any>(`${this.alphaVantageBaseUrl}?function=NEWS_SENTIMENT&tickers=${symbol}&apikey=${this.alphaVantageApiKey}`).pipe(
         catchError(() => of(null))
       )
     }).pipe(
@@ -800,7 +809,7 @@ export class StockMarketService {
     return this.getAlphaVantageData<AlphaVantageCompanyOverview>('OVERVIEW', {
       function: 'OVERVIEW',
       symbol,
-      apikey: environment.alphaVantageApiKey
+      apikey: this.alphaVantageApiKey
     }).pipe(
       map(response => ({
         symbol: response.Symbol,
@@ -820,7 +829,7 @@ export class StockMarketService {
   }
 
   private getFinnhubCompanyOverview(symbol: string): Observable<CompanyOverview> {
-    return this.http.get<any>(`${this.finnhubBaseUrl}/stock/profile2?symbol=${symbol}&token=${environment.finnhubApiKey}`).pipe(
+    return this.http.get<any>(`${this.finnhubBaseUrl}/stock/profile2?symbol=${symbol}&token=${this.finnhubApiKey}`).pipe(
       map(response => ({
         symbol: symbol,
         name: response.name,
@@ -853,7 +862,7 @@ export class StockMarketService {
       function: 'CURRENCY_EXCHANGE_RATE',
       from_currency: fromCurrency,
       to_currency: toCurrency,
-      apikey: environment.alphaVantageApiKey
+      apikey: this.alphaVantageApiKey
     }).pipe(
       map(response => {
         if ('Error Message' in response || 'Note' in response) {
@@ -888,7 +897,7 @@ export class StockMarketService {
       function: 'DIGITAL_CURRENCY_DAILY',
       symbol,
       market: 'USD',
-      apikey: environment.alphaVantageApiKey
+      apikey: this.alphaVantageApiKey
     }).pipe(
       map(response => {
         if ('Error Message' in response || 'Note' in response) {
@@ -926,14 +935,14 @@ export class StockMarketService {
   getEconomicIndicators(indicator: string): Observable<any> {
     return this.getAlphaVantageData(indicator, {
       function: indicator,
-      apikey: environment.alphaVantageApiKey
+      apikey: this.alphaVantageApiKey
     });
   }
 
   getSectorPerformance(): Observable<any> {
     return this.getAlphaVantageData('SECTOR', {
       function: 'SECTOR',
-      apikey: environment.alphaVantageApiKey
+      apikey: this.alphaVantageApiKey
     });
   }
 

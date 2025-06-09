@@ -1,0 +1,70 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title>Twitter Feed</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="refreshFeed()">
+        <ion-icon name="refresh"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <ion-refresher slot="fixed" (ionRefresh)="refreshFeed($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+
+  <div class="feed-container">
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-container">
+      <ion-spinner></ion-spinner>
+      <p>Loading tweets...</p>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error" class="error-container">
+      <ion-icon name="alert-circle"></ion-icon>
+      <p>{{ error }}</p>
+      <ion-button (click)="refreshFeed()">Try Again</ion-button>
+    </div>
+
+    <!-- Tweets List -->
+    <ion-list *ngIf="!loading && !error">
+      <ion-item *ngFor="let tweet of tweets" class="tweet-item">
+        <ion-avatar slot="start" *ngIf="tweet.author.profile_image_url">
+          <img [src]="tweet.author.profile_image_url" [alt]="tweet.author.name">
+        </ion-avatar>
+        <ion-label>
+          <h2>
+            <strong>{{ tweet.author.name }}</strong>
+            <span class="username">{{ '@' + tweet.author.username }}</span>
+          </h2>
+          <p class="tweet-text">{{ tweet.text }}</p>
+          <div class="tweet-metrics">
+            <span>
+              <ion-icon name="chatbubble-outline"></ion-icon>
+              {{ tweet.metrics.replies }}
+            </span>
+            <span>
+              <ion-icon name="repeat-outline"></ion-icon>
+              {{ tweet.metrics.retweets }}
+            </span>
+            <span>
+              <ion-icon name="heart-outline"></ion-icon>
+              {{ tweet.metrics.likes }}
+            </span>
+            <span class="timestamp">
+              {{ tweet.timestamp | date:'MMM d, y, h:mm a' }}
+            </span>
+          </div>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && !error && tweets.length === 0" class="empty-state">
+      <ion-icon name="logo-twitter"></ion-icon>
+      <p>No tweets found. Try refreshing or check back later.</p>
+    </div>
+  </div>
+</ion-content> 

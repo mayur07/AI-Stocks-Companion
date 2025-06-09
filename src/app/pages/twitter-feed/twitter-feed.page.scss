@@ -1,0 +1,98 @@
+.twitter-feed-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 16px;
+}
+
+.feed-container {
+  padding: 16px;
+}
+
+.loading-container,
+.error-container,
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 32px;
+  text-align: center;
+}
+
+.feed-content {
+  .signals-section {
+    margin-bottom: 24px;
+    
+    ion-card-header {
+      background: var(--ion-color-light);
+    }
+    
+    ion-item {
+      --padding-start: 0;
+      --inner-padding-end: 0;
+    }
+  }
+}
+
+.tweet-item {
+  --padding-start: 0;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background: var(--ion-color-light);
+}
+
+.username {
+  color: var(--ion-color-medium);
+  font-size: 0.9em;
+  margin-left: 8px;
+}
+
+.tweet-text {
+  margin: 8px 0;
+  white-space: pre-wrap;
+}
+
+.tweet-metrics {
+  display: flex;
+  gap: 16px;
+  color: var(--ion-color-medium);
+  font-size: 0.9em;
+}
+
+.tweet-metrics span {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.timestamp {
+  margin-left: auto;
+}
+
+ion-icon {
+  font-size: 1.2em;
+}
+
+// Responsive Design
+@media (max-width: 768px) {
+  .twitter-feed-container {
+    padding: 8px;
+  }
+  
+  .tweet-metrics {
+    ion-chip {
+      font-size: 12px;
+    }
+  }
+}
+
+// Dark Mode Support
+:host-context(.dark-theme) {
+  .signals-section ion-card-header {
+    background: var(--ion-color-dark);
+  }
+  
+  .tweet-item {
+    --background: var(--ion-color-dark);
+  }
+} 

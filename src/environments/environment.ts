@@ -8,6 +8,7 @@ export interface Environment {
   alphaVantageApiKey: string;
   finnhubApiKey: string;
   polygonApiKey: string;
+  twelveDataApiKey: string;
   twitter: {
     apiUrl: string;
     bearerToken: string;
@@ -36,9 +37,10 @@ export interface Environment {
 export const environment: Environment = {
   production: false,
   apiUrl: 'http://localhost:3000',
-  alphaVantageApiKey: 'YOUR_ALPHA_VANTAGE_API_KEY',
-  finnhubApiKey: 'YOUR_FINNHUB_API_KEY',
-  polygonApiKey: 'YOUR_POLYGON_API_KEY',
+  alphaVantageApiKey: 'RX4FNXAVLO2H3UCR',
+  finnhubApiKey: 'd0oftnhr01qsib2cdtigd0oftnhr01qsib2cdtj0',
+  polygonApiKey: 's4uQDirUb_r2ZamS1IxNgWzaY2BxIYSl',
+  twelveDataApiKey: '8d2721bb6182468b8e492c0c64e85269',
   
   // Twitter API Configuration
   twitter: {

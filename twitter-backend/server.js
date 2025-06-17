@@ -1,16 +1,16 @@
 const express = require('express');
 const cors = require('cors');
 const { TwitterApi } = require('twitter-api-v2');
-require('dotenv').config();
 
 const app = express();
-const port = process.env.PORT || 3000;
+// const port = process.env.PORT || 3000;
+const port = 3000;
 
-// Get Twitter Bearer Token from environment variables
-const TWITTER_BEARER_TOKEN = process.env.TWITTER_BEARER_TOKEN;
+// Get Twitter Bearer Token (hardcoded)
+const TWITTER_BEARER_TOKEN = 'AAAAAAAAAAAAAAAAAAAAAOc72QEAAAAAhereL3g5x%2BBcEa8EkqxlkhYWshs%3DAsjGxmxcNwpmZiXW4kUqitL2sDAn4RzPOWEhIQ28iwwd5n8kRj'; // <-- Place your token here
 
 if (!TWITTER_BEARER_TOKEN) {
-  console.error('TWITTER_BEARER_TOKEN is not set in environment variables');
+  console.error('TWITTER_BEARER_TOKEN is not set. Please hardcode your token.');
   process.exit(1);
 }
 

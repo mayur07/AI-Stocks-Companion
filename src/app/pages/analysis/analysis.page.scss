@@ -313,6 +313,7 @@
     background: var(--ion-color-primary);
     color: white;
     border-radius: 12px 12px 0 0;
+    padding: 16px;
     
     ion-card-title {
       font-size: 1.5rem;
@@ -321,7 +322,12 @@
     
     ion-card-subtitle {
       color: rgba(255, 255, 255, 0.8);
+      font-size: 0.9rem;
     }
+  }
+  
+  ion-card-content {
+    padding: 16px;
   }
 }
 
@@ -588,5 +594,303 @@
   
   .ai-section {
     padding: 12px;
+  }
+}
+
+.api-section {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background-color: var(--ion-color-light);
+
+  h3 {
+    color: var(--ion-color-primary);
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    font-weight: 600;
+  }
+}
+
+.technical-indicators {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+
+  .indicator {
+    padding: 0.5rem;
+    background-color: var(--ion-color-light-shade);
+    border-radius: 4px;
+
+    .label {
+      font-weight: 600;
+      margin-right: 0.5rem;
+      color: var(--ion-color-medium);
+    }
+
+    span {
+      &.overbought {
+        color: var(--ion-color-danger);
+      }
+
+      &.oversold {
+        color: var(--ion-color-success);
+      }
+
+      &.neutral {
+        color: var(--ion-color-medium);
+      }
+
+      &.positive {
+        color: var(--ion-color-success);
+      }
+
+      &.negative {
+        color: var(--ion-color-danger);
+      }
+    }
+  }
+}
+
+.no-data {
+  padding: 1rem;
+  text-align: center;
+  color: var(--ion-color-medium);
+  font-style: italic;
+}
+
+ion-list {
+  background: transparent;
+}
+
+ion-item {
+  --background: var(--ion-color-light-shade);
+  margin-bottom: 0.5rem;
+  border-radius: 4px;
+
+  ion-label {
+    h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      margin: 0;
+
+      &.positive {
+        color: var(--ion-color-success);
+      }
+
+      &.negative {
+        color: var(--ion-color-danger);
+      }
+
+      &.neutral {
+        color: var(--ion-color-medium);
+      }
+    }
+  }
+}
+
+.prediction-section {
+  margin-bottom: 24px;
+
+  h3 {
+    color: var(--ion-color-primary);
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  .prediction-content {
+    background: var(--ion-color-light);
+    border-radius: 8px;
+    padding: 16px;
+
+    .prediction-text {
+      margin-bottom: 16px;
+      font-size: 1.1rem;
+      line-height: 1.5;
+    }
+
+    .confidence-meter {
+      .confidence-label {
+        margin-bottom: 8px;
+        font-weight: 500;
+      }
+
+      ion-progress-bar {
+        height: 8px;
+        border-radius: 4px;
+      }
+    }
+  }
+}
+
+.factors-section {
+  margin-bottom: 24px;
+
+  h3 {
+    color: var(--ion-color-primary);
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  ion-list {
+    background: transparent;
+    padding: 0;
+
+    ion-item {
+      --background: var(--ion-color-light);
+      --border-radius: 8px;
+      margin-bottom: 8px;
+      --padding-start: 16px;
+      --padding-end: 16px;
+      --padding-top: 12px;
+      --padding-bottom: 12px;
+
+      ion-icon {
+        font-size: 1.2rem;
+        margin-right: 12px;
+      }
+
+      ion-label {
+        font-size: 1rem;
+      }
+    }
+  }
+}
+
+.predictions-section {
+  margin-bottom: 24px;
+
+  h3 {
+    color: var(--ion-color-primary);
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  .price-predictions {
+    display: grid;
+    gap: 12px;
+
+    .prediction-item {
+      background: var(--ion-color-light);
+      border-radius: 8px;
+      padding: 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .label {
+        font-weight: 500;
+        color: var(--ion-color-medium);
+      }
+
+      .value {
+        font-size: 1.1rem;
+        font-weight: 600;
+
+        &.positive {
+          color: var(--ion-color-success);
+        }
+
+        &.negative {
+          color: var(--ion-color-danger);
+        }
+      }
+    }
+  }
+}
+
+.insights-section {
+  margin-bottom: 24px;
+
+  h3 {
+    color: var(--ion-color-primary);
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  .insights-content {
+    .insight-item {
+      background: var(--ion-color-light);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+
+      ion-icon {
+        font-size: 1.2rem;
+        margin-right: 12px;
+        color: var(--ion-color-primary);
+      }
+
+      p {
+        margin: 0;
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+.risk-section {
+  margin-bottom: 24px;
+
+  h3 {
+    color: var(--ion-color-primary);
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  .risk-content {
+    .risk-item {
+      background: var(--ion-color-light);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+
+      ion-icon {
+        font-size: 1.2rem;
+        margin-right: 12px;
+      }
+
+      p {
+        margin: 0;
+        line-height: 1.5;
+      }
+    }
+  }
+}
+
+.recommendations-section {
+  h3 {
+    color: var(--ion-color-primary);
+    font-size: 1.2rem;
+    margin-bottom: 12px;
+  }
+
+  .recommendations-content {
+    .recommendation-item {
+      background: var(--ion-color-light);
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-start;
+
+      ion-icon {
+        font-size: 1.2rem;
+        margin-right: 12px;
+      }
+
+      p {
+        margin: 0;
+        line-height: 1.5;
+      }
+    }
   }
 } 

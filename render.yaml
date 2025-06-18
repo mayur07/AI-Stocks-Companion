@@ -2,7 +2,7 @@ services:
   - type: web
     name: ai-stocks-companion
     env: node
-    buildCommand: npm install && node_modules/@angular/cli/bin/ng build
+    buildCommand: npm install && ./node_modules/.bin/ng build
     startCommand: npx serve -s dist/intelligent-stock-market-companion
     envVars:
       - key: NODE_VERSION

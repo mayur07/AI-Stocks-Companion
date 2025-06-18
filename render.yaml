@@ -1,8 +1,12 @@
 services:
   - type: web
     name: ai-stocks-companion
-    env: static
-    buildCommand: npm install -g @angular/cli && npm install && ng build --configuration production
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npx serve -s dist/intelligent-stock-market-companion
+    envVars:
+      - key: NODE_VERSION
+        value: 18.17.0
     staticPublishPath: ./dist
     routes:
       - type: rewrite

@@ -2,7 +2,7 @@ services:
   - type: web
     name: ai-stocks-companion
     env: static
-    buildCommand: npm install && npm run build
+    buildCommand: npm install -g @angular/cli && npm install && ng build --configuration production
     staticPublishPath: ./dist
     routes:
       - type: rewrite
